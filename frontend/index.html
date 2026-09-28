@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+    <header class="header">
+        <h1>AI Assistant</h1>
+        <p>AI와 데이터를 활용하는 개인 비서</p>
+    </header>
+
+    <main class="main">
+
+        <!-- 왼쪽: 대화 목록 -->
+        <aside class="sidebar">
+
+            <div class="sidebar-header">
+                <h2>대화 목록</h2>
+
+                <button id="new-chat-button">
+                    새 대화
+                </button>
+            </div>
+
+            <div id="conversation-list">
+                <p class="empty-message">
+                    대화를 불러오는 중...
+                </p>
+            </div>
+
+        </aside>
+
+
+        <!-- 가운데: AI 대화 -->
+        <section class="chat-section">
+
+            <div id="chat-messages" class="chat-messages">
+
+                <div class="welcome-message">
+                    <h2>AI Assistant</h2>
+                    <p>
+                        데이터를 바탕으로 궁금한 것을 질문해주세요.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="chat-input-area">
+
+                <textarea
+                    id="message-input"
+                    placeholder="AI에게 질문을 입력하세요."
+                    rows="3"
+                ></textarea>
+
+                <button id="send-button">
+                    보내기
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- 오른쪽: 데이터 요약 + 데이터 관리 -->
+        <aside class="summary-panel">
+
+            <h2>데이터 요약</h2>
+
+            <div id="summary-content">
+                <p>데이터를 불러오는 중...</p>
+            </div>
+
+            <hr>
+
+            <h2>데이터 관리</h2>
+
+            <div class="data-form">
+
+                <input
+                    type="date"
+                    id="data-date"
+                >
+
+                <input
+                    type="number"
+                    id="data-value"
+                    placeholder="값"
+                    step="0.1"
+                >
+
+                <input
+                    type="text"
+                    id="data-memo"
+                    placeholder="메모"
+                >
+
+                <button id="add-data-button">
+                    데이터 추가
+                </button>
+
+            </div>
+
+            <div id="data-list">
+                <p class="empty-message">
+                    데이터를 불러오는 중...
+                </p>
+            </div>
+
+        </aside>
+
+    </main>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
