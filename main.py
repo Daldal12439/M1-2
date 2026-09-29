@@ -1,3 +1,4 @@
+import json
 import os
 
 import firebase_admin
@@ -53,18 +54,32 @@ openai = OpenAI(
 # Firebase 연결
 # ==============================
 
-firebase_key_path = os.getenv(
+firebase_service_account = os.getenv(
     "FIREBASE_SERVICE_ACCOUNT_JSON"
 )
 
-if not firebase_key_path:
+if not firebase_service_account:
     raise ValueError(
         "FIREBASE_SERVICE_ACCOUNT_JSON 환경변수가 설정되지 않았습니다."
     )
 
-cred = credentials.Certificate(
-    firebase_key_path
-)
+try:
+    if firebase_service_account.strip().startswith("{"):
+        service_account_info = json.loads(
+            firebase_service_account
+        )
+        cred = credentials.Certificate(
+            service_account_info
+        )
+    else:
+        cred = credentials.Certificate(
+            firebase_service_account
+        )
+
+except (json.JSONDecodeError, ValueError) as error:
+    raise ValueError(
+        "FIREBASE_SERVICE_ACCOUNT_JSON 형식이 올바르지 않습니다."
+    ) from error
 
 if not firebase_admin._apps:
     firebase_admin.initialize_app(cred)
@@ -146,11 +161,9 @@ def get_data_summary():
 def chat(request: ChatRequest):
 
     # 데이터 요약
-
     summary = get_summary(db)
 
     # AI 서비스 호출
-
     result = chat_with_ai(
         openai=openai,
         db=db,
