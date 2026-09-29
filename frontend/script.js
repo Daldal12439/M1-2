@@ -18,6 +18,18 @@ const dataMemo = document.getElementById("data-memo");
 const addDataButton = document.getElementById("add-data-button");
 const dataList = document.getElementById("data-list");
 
+const mobileConversationButton =
+    document.getElementById("mobile-conversation-button");
+
+const mobileDataButton =
+    document.getElementById("mobile-data-button");
+
+const sidebar =
+    document.querySelector(".sidebar");
+
+const summaryPanel =
+    document.querySelector(".summary-panel");
+
 
 // 페이지 시작
 document.addEventListener("DOMContentLoaded", () => {
@@ -25,6 +37,37 @@ document.addEventListener("DOMContentLoaded", () => {
     loadSummary();
     loadData();
 });
+
+
+// ==============================
+// 모바일 메뉴
+// ==============================
+
+mobileConversationButton.addEventListener(
+    "click",
+    () => {
+        sidebar.classList.toggle("mobile-open");
+
+        summaryPanel.classList.remove("mobile-open");
+    }
+);
+
+
+mobileDataButton.addEventListener(
+    "click",
+    () => {
+        summaryPanel.classList.toggle("mobile-open");
+
+        sidebar.classList.remove("mobile-open");
+    }
+);
+
+
+// 모바일 패널 닫기
+function closeMobilePanels() {
+    sidebar.classList.remove("mobile-open");
+    summaryPanel.classList.remove("mobile-open");
+}
 
 
 // ==============================
@@ -38,7 +81,9 @@ async function loadData() {
         );
 
         if (!response.ok) {
-            throw new Error("데이터 목록을 불러오지 못했습니다.");
+            throw new Error(
+                "데이터 목록을 불러오지 못했습니다."
+            );
         }
 
         const data = await response.json();
@@ -52,11 +97,15 @@ async function loadData() {
         }
 
         const recentData = data
-            .sort((a, b) => b.date.localeCompare(a.date))
+            .sort(
+                (a, b) =>
+                    b.date.localeCompare(a.date)
+            )
             .slice(0, 10);
 
         recentData.forEach(item => {
-            const itemElement = document.createElement("div");
+            const itemElement =
+                document.createElement("div");
 
             itemElement.className = "data-item";
 
@@ -86,15 +135,21 @@ async function loadData() {
 
             itemElement
                 .querySelector(".edit-data-button")
-                .addEventListener("click", () => {
-                    startEditData(item);
-                });
+                .addEventListener(
+                    "click",
+                    () => {
+                        startEditData(item);
+                    }
+                );
 
             itemElement
                 .querySelector(".delete-data-button")
-                .addEventListener("click", () => {
-                    deleteData(item.id);
-                });
+                .addEventListener(
+                    "click",
+                    () => {
+                        deleteData(item.id);
+                    }
+                );
 
             dataList.appendChild(itemElement);
         });
@@ -123,6 +178,8 @@ function startEditData(item) {
     dataMemo.value = item.memo || "";
 
     addDataButton.textContent = "데이터 수정";
+
+    closeMobilePanels();
 }
 
 
@@ -140,7 +197,6 @@ async function addData() {
         return;
     }
 
-    // 수정 중이면 수정 함수 실행
     if (editingDataId) {
         await updateData(editingDataId);
         return;
@@ -166,7 +222,9 @@ async function addData() {
         );
 
         if (!response.ok) {
-            throw new Error("데이터 추가에 실패했습니다.");
+            throw new Error(
+                "데이터 추가에 실패했습니다."
+            );
         }
 
         dataDate.value = "";
@@ -225,7 +283,9 @@ async function updateData(dataId) {
         );
 
         if (!response.ok) {
-            throw new Error("데이터 수정에 실패했습니다.");
+            throw new Error(
+                "데이터 수정에 실패했습니다."
+            );
         }
 
         editingDataId = null;
@@ -270,7 +330,9 @@ async function deleteData(dataId) {
         );
 
         if (!response.ok) {
-            throw new Error("데이터 삭제에 실패했습니다.");
+            throw new Error(
+                "데이터 삭제에 실패했습니다."
+            );
         }
 
         await loadData();
@@ -298,10 +360,13 @@ async function loadConversations() {
         );
 
         if (!response.ok) {
-            throw new Error("대화 목록을 불러오지 못했습니다.");
+            throw new Error(
+                "대화 목록을 불러오지 못했습니다."
+            );
         }
 
-        const conversations = await response.json();
+        const conversations =
+            await response.json();
 
         conversationList.innerHTML = "";
 
@@ -311,18 +376,29 @@ async function loadConversations() {
             return;
         }
 
-        conversations.forEach(conversation => {
-            const item = document.createElement("div");
+        conversations.forEach(
+            conversation => {
+                const item =
+                    document.createElement("div");
 
-            item.className = "conversation-item";
-            item.textContent = conversation.title;
+                item.className =
+                    "conversation-item";
 
-            item.addEventListener("click", () => {
-                loadConversation(conversation.id);
-            });
+                item.textContent =
+                    conversation.title;
 
-            conversationList.appendChild(item);
-        });
+                item.addEventListener(
+                    "click",
+                    () => {
+                        loadConversation(
+                            conversation.id
+                        );
+                    }
+                );
+
+                conversationList.appendChild(item);
+            }
+        );
 
     } catch (error) {
         console.error(
@@ -337,28 +413,38 @@ async function loadConversations() {
 // 특정 대화 불러오기
 // ==============================
 
-async function loadConversation(conversationId) {
+async function loadConversation(
+    conversationId
+) {
     try {
         const response = await fetch(
             `${API_BASE_URL}/api/conversations/${conversationId}`
         );
 
         if (!response.ok) {
-            throw new Error("대화를 불러오지 못했습니다.");
+            throw new Error(
+                "대화를 불러오지 못했습니다."
+            );
         }
 
-        const conversation = await response.json();
+        const conversation =
+            await response.json();
 
-        currentConversationId = conversation.id;
+        currentConversationId =
+            conversation.id;
 
         chatMessages.innerHTML = "";
 
-        conversation.messages.forEach(message => {
-            addMessage(
-                message.role,
-                message.content
-            );
-        });
+        conversation.messages.forEach(
+            message => {
+                addMessage(
+                    message.role,
+                    message.content
+                );
+            }
+        );
+
+        closeMobilePanels();
 
     } catch (error) {
         console.error(
@@ -380,10 +466,13 @@ async function loadSummary() {
         );
 
         if (!response.ok) {
-            throw new Error("요약 정보를 불러오지 못했습니다.");
+            throw new Error(
+                "요약 정보를 불러오지 못했습니다."
+            );
         }
 
-        const summary = await response.json();
+        const summary =
+            await response.json();
 
         if (summary.count === 0) {
             summaryContent.innerHTML =
@@ -440,9 +529,12 @@ async function loadSummary() {
 // ==============================
 
 function addMessage(role, content) {
-    const message = document.createElement("div");
+    const message =
+        document.createElement("div");
 
-    message.className = `message ${role}`;
+    message.className =
+        `message ${role}`;
+
     message.textContent = content;
 
     chatMessages.appendChild(message);
@@ -457,18 +549,23 @@ function addMessage(role, content) {
 // ==============================
 
 async function sendMessage() {
-    const message = messageInput.value.trim();
+    const message =
+        messageInput.value.trim();
 
     if (!message) {
         return;
     }
 
-    addMessage("user", message);
+    addMessage(
+        "user",
+        message
+    );
 
     messageInput.value = "";
 
     sendButton.disabled = true;
-    sendButton.textContent = "전송 중...";
+    sendButton.textContent =
+        "전송 중...";
 
     try {
         const response = await fetch(
@@ -476,16 +573,19 @@ async function sendMessage() {
             {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type":
+                        "application/json"
                 },
                 body: JSON.stringify({
                     message: message,
-                    conversation_id: currentConversationId
+                    conversation_id:
+                        currentConversationId
                 })
             }
         );
 
-        const result = await response.json();
+        const result =
+            await response.json();
 
         if (!response.ok) {
             throw new Error(
@@ -515,7 +615,8 @@ async function sendMessage() {
 
     } finally {
         sendButton.disabled = false;
-        sendButton.textContent = "보내기";
+        sendButton.textContent =
+            "보내기";
     }
 }
 
@@ -537,6 +638,8 @@ function startNewChat() {
     `;
 
     messageInput.value = "";
+
+    closeMobilePanels();
 }
 
 

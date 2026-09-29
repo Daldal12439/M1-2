@@ -18,105 +18,121 @@
 
     <main class="main">
 
-        <!-- 왼쪽: 대화 목록 -->
-        <aside class="sidebar">
+    <!-- 모바일 상단 메뉴 -->
+    <div class="mobile-toolbar">
 
-            <div class="sidebar-header">
-                <h2>대화 목록</h2>
+        <button id="mobile-conversation-button">
+            ☰ 대화 목록
+        </button>
 
-                <button id="new-chat-button">
-                    새 대화
-                </button>
-            </div>
+        <strong>AI Assistant</strong>
 
-            <div id="conversation-list">
-                <p class="empty-message">
-                    대화를 불러오는 중...
+        <button id="mobile-data-button">
+            📊 데이터
+        </button>
+
+    </div>
+
+
+    <!-- 왼쪽: 대화 목록 -->
+    <aside class="sidebar">
+
+        <div class="sidebar-header">
+            <h2>대화 목록</h2>
+
+            <button id="new-chat-button">
+                새 대화
+            </button>
+        </div>
+
+        <div id="conversation-list">
+            <p class="empty-message">
+                대화를 불러오는 중...
+            </p>
+        </div>
+
+    </aside>
+
+
+    <!-- 가운데: AI 대화 -->
+    <section class="chat-section">
+
+        <div id="chat-messages" class="chat-messages">
+
+            <div class="welcome-message">
+                <h2>AI Assistant</h2>
+                <p>
+                    데이터를 바탕으로 궁금한 것을 질문해주세요.
                 </p>
             </div>
 
-        </aside>
+        </div>
+
+        <div class="chat-input-area">
+
+            <textarea
+                id="message-input"
+                placeholder="AI에게 질문을 입력하세요."
+                rows="3"
+            ></textarea>
+
+            <button id="send-button">
+                보내기
+            </button>
+
+        </div>
+
+    </section>
 
 
-        <!-- 가운데: AI 대화 -->
-        <section class="chat-section">
+    <!-- 오른쪽: 데이터 요약 + 데이터 관리 -->
+    <aside class="summary-panel">
 
-            <div id="chat-messages" class="chat-messages">
+        <h2>데이터 요약</h2>
 
-                <div class="welcome-message">
-                    <h2>AI Assistant</h2>
-                    <p>
-                        데이터를 바탕으로 궁금한 것을 질문해주세요.
-                    </p>
-                </div>
+        <div id="summary-content">
+            <p>데이터를 불러오는 중...</p>
+        </div>
 
-            </div>
+        <hr>
 
-            <div class="chat-input-area">
+        <h2>데이터 관리</h2>
 
-                <textarea
-                    id="message-input"
-                    placeholder="AI에게 질문을 입력하세요."
-                    rows="3"
-                ></textarea>
+        <div class="data-form">
 
-                <button id="send-button">
-                    보내기
-                </button>
+            <input
+                type="date"
+                id="data-date"
+            >
 
-            </div>
+            <input
+                type="number"
+                id="data-value"
+                placeholder="값"
+                step="0.1"
+            >
 
-        </section>
+            <input
+                type="text"
+                id="data-memo"
+                placeholder="메모"
+            >
 
+            <button id="add-data-button">
+                데이터 추가
+            </button>
 
-        <!-- 오른쪽: 데이터 요약 + 데이터 관리 -->
-        <aside class="summary-panel">
+        </div>
 
-            <h2>데이터 요약</h2>
+        <div id="data-list">
+            <p class="empty-message">
+                데이터를 불러오는 중...
+            </p>
+        </div>
 
-            <div id="summary-content">
-                <p>데이터를 불러오는 중...</p>
-            </div>
+    </aside>
 
-            <hr>
-
-            <h2>데이터 관리</h2>
-
-            <div class="data-form">
-
-                <input
-                    type="date"
-                    id="data-date"
-                >
-
-                <input
-                    type="number"
-                    id="data-value"
-                    placeholder="값"
-                    step="0.1"
-                >
-
-                <input
-                    type="text"
-                    id="data-memo"
-                    placeholder="메모"
-                >
-
-                <button id="add-data-button">
-                    데이터 추가
-                </button>
-
-            </div>
-
-            <div id="data-list">
-                <p class="empty-message">
-                    데이터를 불러오는 중...
-                </p>
-            </div>
-
-        </aside>
-
-    </main>
+</main>
 
 </div>
 
