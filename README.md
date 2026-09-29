@@ -54,12 +54,17 @@
 * Windows
 * Python Virtual Environment (`.venv`)
 
+### Deployment
+
+* Render
+
 ---
 
 ## 3. 프로젝트 구조
 
 ```text
 ai-assistant/
+
 │
 ├── frontend/
 │   ├── index.html
@@ -80,6 +85,7 @@ ai-assistant/
 ├── OBS_ASOS_DD_20260922162003.csv
 ├── .env
 ├── .gitignore
+├── requirements.txt
 └── README.md
 ```
 
@@ -100,6 +106,7 @@ ai-assistant/
 | `OBS_ASOS_DD_20260922162003.csv` | 분석 및 테스트에 사용한 원본 데이터                                       |
 | `.env`                           | API 키 및 Firebase 관련 환경변수                                   |
 | `.gitignore`                     | 민감정보 및 가상환경 파일 제외                                          |
+| `requirements.txt`               | Python 의존성 목록                                              |
 
 ---
 
@@ -130,7 +137,7 @@ FIREBASE_SERVICE_ACCOUNT_JSON=your_firebase_service_account_json
 
 `OPENAI_API_KEY`는 OpenAI API 인증에 사용한다.
 
-`FIREBASE_SERVICE_ACCOUNT_JSON`은 Firebase Admin SDK가 Firestore에 접근하기 위한 서비스 계정 JSON 파일의 경로이다.
+`FIREBASE_SERVICE_ACCOUNT_JSON`은 Firebase Admin SDK가 Firestore에 접근하기 위한 서비스 계정 인증정보이다.
 
 실제 API 키와 Firebase 인증정보는 GitHub에 업로드하지 않는다.
 
@@ -212,6 +219,7 @@ http://localhost:5500/
 
 ```text
 data
+
 └── document
     ├── date: "2024-01-01"
     ├── value: 3.2
@@ -238,6 +246,7 @@ AI 대화 내용을 저장한다.
 
 ```text
 conversations
+
 └── document
     ├── title: "데이터 기간 질문"
     └── messages:
@@ -472,6 +481,7 @@ DOM 갱신
 
 ```text
 main.py
+
 │
 ├── FastAPI 앱 초기화
 ├── CORS 설정
@@ -513,8 +523,11 @@ FastAPI에서는 Pydantic 모델을 사용하여 API 요청의 타입과 기본�
 
 ```python
 class DataCreate(BaseModel):
+
     date: str = Field(min_length=1, max_length=20)
+
     value: float = Field(ge=-1000000, le=1000000)
+
     memo: str = Field(default="", max_length=500)
 ```
 
@@ -522,6 +535,7 @@ AI 채팅 요청은 다음과 같이 질문 길이를 제한한다.
 
 ```python
 class ChatRequest(BaseModel):
+
     message: str = Field(
         min_length=1,
         max_length=5000
@@ -572,8 +586,11 @@ API 키와 Firebase 인증정보는 소스 코드에 직접 작성하지 않고 
 
 ```text
 .venv/
+
 __pycache__/
+
 .env
+
 firebase-service-account.json
 ```
 
@@ -583,29 +600,37 @@ firebase-service-account.json
 * `firebase-service-account.json`
 * `.venv/`
 
-### 배포 시
+### 배포 환경
 
-Render, Railway 등의 서버 환경을 사용할 경우 플랫폼의 Environment Variables 기능을 이용하여 API 키와 Firebase 인증정보를 설정할 수 있다.
+백엔드 배포에는 Render를 사용하였다.
 
-프론트엔드에서 사용하는 백엔드 URL은 현재 로컬 환경에서 다음과 같다.
+Render의 Environment Variables 기능을 이용하여 다음 환경변수를 등록하였다.
 
 ```text
-http://127.0.0.1:8000
+OPENAI_API_KEY
+FIREBASE_SERVICE_ACCOUNT_JSON
 ```
 
-실제 배포 시에는 배포된 백엔드의 HTTPS URL로 변경해야 한다.
+Firebase 서비스 계정 인증정보는 JSON 내용을 배포 환경의 환경변수로 등록하여 사용한다.
 
-또한 Firebase 서비스 계정 인증정보도 배포 환경의 안전한 환경변수 또는 Secret 관리 기능을 이용하여 제공해야 한다.
+프론트엔드에는 OpenAI API 키나 Firebase 인증정보를 저장하지 않으며, 배포된 백엔드 HTTPS 주소를 통해 API를 호출한다.
+
+프론트엔드에서 사용하는 백엔드 주소는 다음과 같다.
+
+```text
+https://ai-assistant-n8nl.onrender.com
+```
 
 ---
 
 ## 14. CORS
 
-현재 로컬 개발 환경을 위해 다음 두 개의 프론트엔드 주소를 허용한다.
+로컬 개발 환경과 배포된 프론트엔드에서 API를 호출할 수 있도록 다음 Origin을 허용한다.
 
 ```text
 http://127.0.0.1:5500
 http://localhost:5500
+https://ai-assistant-frontend-1zlg.onrender.com
 ```
 
 FastAPI에서는 다음과 같이 설정되어 있다.
@@ -614,20 +639,11 @@ FastAPI에서는 다음과 같이 설정되어 있다.
 allow_origins=[
     "http://127.0.0.1:5500",
     "http://localhost:5500",
+    "https://ai-assistant-frontend-1zlg.onrender.com",
 ]
 ```
 
-배포 시에는 실제 프론트엔드 도메인만 허용하도록 `allow_origins`를 변경해야 한다.
-
-예:
-
-```python
-allow_origins=[
-    "https://배포된-프론트엔드-주소"
-]
-```
-
-운영 환경에서는 불필요하게 모든 Origin을 허용하지 않는 것을 원칙으로 한다.
+운영 환경에서는 불필요하게 모든 Origin을 허용하지 않고 필요한 프론트엔드 Origin만 허용하도록 구성하였다.
 
 ---
 
@@ -663,10 +679,10 @@ CSS 미디어 쿼리를 사용하여 화면 크기에 따라 레이아웃을 변
 │ ☰ 대화 목록  📊 데이터 │
 ├─────────────────────┤
 │                     │
-│       AI 채팅        │
+│       AI 채팅       │
 │                     │
 ├─────────────────────┤
-│ 입력창       전송     │
+│ 입력창       전송    │
 └─────────────────────┘
 ```
 
@@ -676,9 +692,9 @@ CSS 미디어 쿼리를 사용하여 화면 크기에 따라 레이아웃을 변
 
 ## 16. 콜드스타트 및 운영 고려사항
 
-현재 프로젝트는 로컬 개발 환경에서 실행하는 것을 기준으로 한다.
+현재 프로젝트는 Render를 이용하여 프론트엔드와 백엔드를 배포하였다.
 
-클라우드 서버에 배포할 경우 무료 또는 저사양 서버에서는 일정 시간 요청이 없을 때 서버가 sleep 상태가 될 수 있으며, 첫 요청에 추가 응답 시간이 발생할 수 있다.
+무료 또는 저사양 서버에서는 일정 시간 요청이 없을 때 서버가 sleep 상태가 될 수 있으며, 첫 요청에 추가 응답 시간이 발생할 수 있다.
 
 이를 일반적으로 콜드스타트라고 한다.
 
@@ -691,8 +707,6 @@ CSS 미디어 쿼리를 사용하여 화면 크기에 따라 레이아웃을 변
 
 현재 프론트엔드는 API 요청 중 로딩 메시지와 버튼 상태 변경을 사용하여 사용자가 요청 처리 상태를 확인할 수 있도록 구성하였다.
 
-향후 배포 시 서버 플랫폼의 sleep 정책과 초기 요청 지연 여부를 확인할 필요가 있다.
-
 ---
 
 ## 17. API 테스트
@@ -700,7 +714,7 @@ CSS 미디어 쿼리를 사용하여 화면 크기에 따라 레이아웃을 변
 FastAPI Swagger UI에서 API를 직접 테스트할 수 있다.
 
 ```text
-http://127.0.0.1:8000/docs
+https://ai-assistant-n8nl.onrender.com/docs
 ```
 
 예를 들어 데이터 요약 API를 실행하면 다음과 같은 결과를 확인할 수 있다.
@@ -736,7 +750,7 @@ Swagger UI에서는 Pydantic의 요청 및 응답 모델도 확인할 수 있다
 
 ## 18. 현재 테스트 결과
 
-현재 로컬 환경에서 다음 기능을 확인하였다.
+현재 로컬 환경 및 배포 환경에서 다음 기능을 확인하였다.
 
 * 데이터 추가 정상 작동
 * 데이터 조회 정상 작동
@@ -752,49 +766,61 @@ Swagger UI에서는 Pydantic의 요청 및 응답 모델도 확인할 수 있다
 * 모바일 반응형 UI 정상 작동
 * FastAPI Swagger 문서 정상 작동
 * Router/Service 분리 후 API 정상 작동
+* Render 백엔드 배포 정상 작동
+* Render 프론트엔드 배포 정상 작동
+* 배포된 프론트엔드와 백엔드 간 CORS 연결 정상 작동
+* 배포 환경에서 Firestore 데이터 조회 정상 작동
+* 배포 환경에서 AI 데이터 기반 질문 정상 작동
+
+배포 환경에서 다음 질문을 테스트하였다.
+
+```text
+전체 기간 평균 기온은 몇 도야?
+```
+
+저장된 데이터의 요약 정보를 바탕으로 평균 기온 약 14.52도를 정상적으로 응답하는 것을 확인하였다.
 
 ---
 
 ## 19. 배포
 
-현재 버전은 로컬 개발 환경을 기준으로 한다.
+Render를 이용하여 프론트엔드와 백엔드를 배포하였다.
 
 ### Frontend
 
 ```text
-http://localhost:5500/
+https://ai-assistant-frontend-1zlg.onrender.com
 ```
 
 ### Backend
 
 ```text
-http://127.0.0.1:8000
+https://ai-assistant-n8nl.onrender.com
 ```
 
 ### Swagger
 
 ```text
-http://127.0.0.1:8000/docs
+https://ai-assistant-n8nl.onrender.com/docs
 ```
 
-현재는 실제 외부 서비스에 배포된 URL이 없는 상태이다.
+### 배포 과정
 
-실제 서비스 배포 시에는 다음 작업이 필요하다.
-
-1. FastAPI 백엔드 배포
+1. FastAPI 백엔드 Render 배포
 2. OpenAI API 키 환경변수 등록
 3. Firebase 인증정보 환경변수 등록
 4. 프론트엔드의 `API_BASE_URL`을 배포된 백엔드 HTTPS 주소로 변경
 5. CORS에 배포된 프론트엔드 도메인 등록
-6. HTTPS 적용
-7. 배포된 서비스의 정상 동작 확인
-8. 필요할 경우 health check 및 모니터링 구성
+6. 프론트엔드 Render 배포
+7. 배포된 서비스에서 데이터 및 요약 정보 조회 확인
+8. 배포된 서비스에서 AI 채팅 정상 작동 확인
+
+현재 배포된 프론트엔드는 배포된 FastAPI 백엔드와 연결되어 Firestore 데이터 조회, 데이터 요약 및 AI 채팅 기능을 사용할 수 있다.
 
 ---
 
 ## 20. 향후 개선 사항
 
-* 실제 서비스 배포
 * 사용자 인증 및 권한 관리
 * 사용자별 Firestore 데이터 분리
 * 데이터 기간 필터 추가
