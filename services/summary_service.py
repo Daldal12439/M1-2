@@ -1,41 +1,67 @@
 def get_summary(db):
     docs = db.collection("data").stream()
 
-    values = []
-    dates = []
+    data_list = [doc.to_dict() for doc in docs]
 
-    for doc in docs:
-        data = doc.to_dict()
-
-        if "value" in data:
-            values.append(float(data["value"]))
-
-        if "date" in data:
-            dates.append(data["date"])
-
-    if not values:
+    if not data_list:
         return {
-            "period": "데이터 없음",
+            "period": None,
             "count": 0,
             "metrics": {
-                "average": 0,
-                "max": 0,
-                "min": 0
+                "average": None,
+                "max": None,
+                "min": None
             },
             "trend": "데이터 없음"
         }
 
-    average = round(sum(values) / len(values), 2)
+    values = [float(item["value"]) for item in data_list]
+    dates = sorted(item["date"] for item in data_list)
+
+    average = sum(values) / len(values)
     maximum = max(values)
     minimum = min(values)
 
-    trend = "상승" if values[-1] >= values[0] else "하락"
+    sorted_data = sorted(
+        data_list,
+        key=lambda x: x["date"]
+    )
+
+    if len(sorted_data) >= 14:
+        recent_values = [
+            float(item["value"])
+            for item in sorted_data[-7:]
+        ]
+
+        previous_values = [
+            float(item["value"])
+            for item in sorted_data[-14:-7]
+        ]
+
+        recent_average = (
+            sum(recent_values) / len(recent_values)
+        )
+
+        previous_average = (
+            sum(previous_values) / len(previous_values)
+        )
+
+        difference = recent_average - previous_average
+
+        if difference > 0.5:
+            trend = "상승"
+        elif difference < -0.5:
+            trend = "하락"
+        else:
+            trend = "유지"
+    else:
+        trend = "데이터 부족"
 
     return {
-        "period": f"{min(dates)} ~ {max(dates)}",
-        "count": len(values),
+        "period": f"{dates[0]} ~ {dates[-1]}",
+        "count": len(data_list),
         "metrics": {
-            "average": average,
+            "average": round(average, 2),
             "max": maximum,
             "min": minimum
         },
