@@ -31,10 +31,11 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://127.0.0.1:5500",
-        "http://localhost:5500",
-    ],
+   allow_origins=[
+    "http://127.0.0.1:5500",
+    "http://localhost:5500",
+    "https://ai-assistant-frontend-1zlg.onrender.com",
+],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
